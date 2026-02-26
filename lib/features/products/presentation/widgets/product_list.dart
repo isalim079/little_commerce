@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:little_commerce/core/constants/app_colors.dart';
 import 'package:little_commerce/core/constants/app_constants.dart';
+import 'package:little_commerce/features/cart/presentation/providers/cart_provider.dart';
 import 'package:little_commerce/features/products/data/models/product_model.dart';
 import 'package:little_commerce/features/products/presentation/pages/product_detail_page.dart';
 import 'package:little_commerce/features/products/presentation/widgets/product_card.dart';
 
-class ProductList extends StatelessWidget {
+class ProductList extends ConsumerWidget {
   final List<ProductModel> products;
 
   const ProductList({
@@ -14,7 +16,7 @@ class ProductList extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Padding(
       padding: const EdgeInsets.symmetric(
         horizontal: AppConstants.paddingMedium,
@@ -73,6 +75,9 @@ class ProductList extends StatelessWidget {
                   price: product.price,
                   rating: product.rating,
                   imageUrl: product.image,
+                  onAddToCart: () {
+                    ref.read(cartProvider.notifier).addToCart(product);
+                  },
                 ),
               );
             },

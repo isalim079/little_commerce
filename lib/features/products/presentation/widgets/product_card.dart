@@ -8,6 +8,7 @@ class ProductCard extends StatelessWidget {
   final double price;
   final double rating;
   final String imageUrl;
+  final VoidCallback? onAddToCart;
 
   const ProductCard({
     super.key,
@@ -16,6 +17,7 @@ class ProductCard extends StatelessWidget {
     required this.price,
     required this.rating,
     required this.imageUrl,
+    this.onAddToCart,
   });
 
   @override
@@ -176,7 +178,7 @@ class ProductCard extends StatelessWidget {
                 ),
               ),
               GestureDetector(
-                onTap: () {},
+                onTap: onAddToCart,
                 child: Container(
                   padding: const EdgeInsets.all(6),
                   decoration: BoxDecoration(

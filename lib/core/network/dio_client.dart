@@ -1,11 +1,12 @@
 
 import 'package:dio/dio.dart';
 import 'package:little_commerce/core/constants/api_constants.dart';
+import 'package:little_commerce/core/services/storage_service.dart';
 
 class DioClient {
-  DioClient._(); // private constructor
+  DioClient._();
 
-  static Dio? _dio; // single instance
+  static Dio? _dio;
 
   static Dio get instance {
     _dio ??= _createDio();
@@ -25,27 +26,27 @@ class DioClient {
       ),
     );
 
-    // Add interceptors
     dio.interceptors.add(_buildInterceptor());
-
     return dio;
   }
 
   static Interceptor _buildInterceptor() {
     return InterceptorsWrapper(
-      // Fires before every request
-      onRequest: (options, handler) {
+      onRequest: (options, handler) async {
+        final token = await StorageService.getToken();
+        if (token != null) {
+          options.headers['Authorization'] = 'Bearer $token';
+        }
         print('REQUEST [${options.method}] => ${options.uri}');
         return handler.next(options);
       },
-
-      // Fires when response comes back
       onResponse: (response, handler) {
-        print('RESPONSE [${response.statusCode}] => ${response.requestOptions.uri}');
+        print(
+          'RESPONSE [${response.statusCode}] => '
+          '${response.requestOptions.uri}',
+        );
         return handler.next(response);
       },
-
-      // Fires when any error happens
       onError: (DioException error, handler) {
         print('ERROR [${error.response?.statusCode}] => ${error.message}');
         return handler.next(error);

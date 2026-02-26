@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:little_commerce/core/constants/app_colors.dart';
 import 'package:little_commerce/core/constants/app_constants.dart';
+import 'package:little_commerce/features/cart/presentation/pages/cart_page.dart';
+import 'package:little_commerce/features/cart/presentation/providers/cart_provider.dart';
 import 'package:little_commerce/features/products/presentation/providers/product_provider.dart';
 import 'package:little_commerce/features/products/presentation/widgets/category_tabs.dart';
 import 'package:little_commerce/features/products/presentation/widgets/home_banner.dart';
@@ -23,7 +25,7 @@ class HomePage extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: _buildAppBar(),
+      appBar: _buildAppBar(context, ref),
       body: RefreshIndicator(
         color: AppColors.primary,
         onRefresh: () async {
@@ -61,7 +63,10 @@ class HomePage extends ConsumerWidget {
     );
   }
 
-  AppBar _buildAppBar() {
+  AppBar _buildAppBar(BuildContext context, WidgetRef ref) {
+    final cartTotal = ref.watch(cartProvider).totalItems;
+    final badgeText = cartTotal > 9 ? '9+' : '$cartTotal';
+
     return AppBar(
       backgroundColor: AppColors.cardBackground,
       elevation: 0,
@@ -81,7 +86,14 @@ class HomePage extends ConsumerWidget {
                 Icons.shopping_cart_outlined,
                 color: AppColors.textPrimary,
               ),
-              onPressed: () {},
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute<void>(
+                    builder: (_) => const CartPage(),
+                  ),
+                );
+              },
             ),
             Positioned(
               right: 6,
@@ -92,9 +104,9 @@ class HomePage extends ConsumerWidget {
                   color: AppColors.error,
                   shape: BoxShape.circle,
                 ),
-                child: const Text(
-                  '0',
-                  style: TextStyle(
+                child: Text(
+                  badgeText,
+                  style: const TextStyle(
                     color: AppColors.secondary,
                     fontSize: 10,
                     fontWeight: FontWeight.bold,

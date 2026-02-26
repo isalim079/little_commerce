@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:little_commerce/core/constants/app_colors.dart';
 import 'package:little_commerce/core/constants/app_constants.dart';
+import 'package:little_commerce/features/cart/presentation/providers/cart_provider.dart';
 import 'package:little_commerce/features/products/data/models/product_model.dart';
 
-class ProductDetailPage extends StatelessWidget {
+class ProductDetailPage extends ConsumerWidget {
   final ProductModel product;
 
   const ProductDetailPage({
@@ -12,7 +14,7 @@ class ProductDetailPage extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       backgroundColor: AppColors.background,
       body: Stack(
@@ -29,7 +31,7 @@ class ProductDetailPage extends StatelessWidget {
             bottom: 0,
             left: 0,
             right: 0,
-            child: _buildBottomBar(context),
+            child: _buildBottomBar(context, ref),
           ),
         ],
       ),
@@ -224,7 +226,7 @@ class ProductDetailPage extends StatelessWidget {
     );
   }
 
-  Widget _buildBottomBar(BuildContext context) {
+  Widget _buildBottomBar(BuildContext context, WidgetRef ref) {
     return Container(
       padding: EdgeInsets.only(
         left: AppConstants.paddingLarge,
@@ -269,7 +271,16 @@ class ProductDetailPage extends StatelessWidget {
           const SizedBox(width: AppConstants.paddingLarge),
           Expanded(
             child: GestureDetector(
-              onTap: () {},
+              onTap: () {
+                ref.read(cartProvider.notifier).addToCart(product);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Added to cart!'),
+                    duration: Duration(seconds: 1),
+                    backgroundColor: Colors.green,
+                  ),
+                );
+              },
               child: Container(
                 padding: const EdgeInsets.symmetric(
                   vertical: AppConstants.paddingMedium,
