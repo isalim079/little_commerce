@@ -279,35 +279,41 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
   // Shows test credentials so you don't forget them
   Widget _buildTestCredentials() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(AppConstants.paddingMedium),
-      decoration: BoxDecoration(
-        color: Colors.blue.withOpacity(0.07),
-        borderRadius: BorderRadius.circular(AppConstants.borderRadiusMedium),
-        border: Border.all(color: Colors.blue.withOpacity(0.2)),
-      ),
-      child: const Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            '🧪 Test Credentials',
-            style: TextStyle(
-              color: Colors.blue,
-              fontWeight: FontWeight.bold,
-              fontSize: AppConstants.fontSizeMedium,
+    return GestureDetector(
+      onTap: () {
+        _usernameController.text = 'johnd';
+        _passwordController.text = 'm38rmF\$';
+      },
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(AppConstants.paddingMedium),
+        decoration: BoxDecoration(
+          color: Colors.blue.withOpacity(0.07),
+          borderRadius: BorderRadius.circular(AppConstants.borderRadiusMedium),
+          border: Border.all(color: Colors.blue.withOpacity(0.2)),
+        ),
+        child: const Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              '🧪 Test Credentials',
+              style: TextStyle(
+                color: Colors.blue,
+                fontWeight: FontWeight.bold,
+                fontSize: AppConstants.fontSizeMedium,
+              ),
             ),
-          ),
-          SizedBox(height: 6),
-          Text(
-            'Username: johnd\nPassword: m38rmF\$',
-            style: TextStyle(
-              color: Colors.blue,
-              fontSize: AppConstants.fontSizeMedium,
-              height: 1.6,
+            SizedBox(height: 6),
+            Text(
+              'Username: johnd\nPassword: m38rmF\$',
+              style: TextStyle(
+                color: Colors.blue,
+                fontSize: AppConstants.fontSizeMedium,
+                height: 1.6,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
