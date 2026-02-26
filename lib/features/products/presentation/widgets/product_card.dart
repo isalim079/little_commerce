@@ -167,16 +167,20 @@ class ProductCard extends StatelessWidget {
 
           // Price + Add to cart
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                '\$$price',
-                style: const TextStyle(
-                  color: AppColors.textPrimary,
-                  fontSize: AppConstants.fontSizeNormal,
-                  fontWeight: FontWeight.bold,
+              Expanded(
+                child: Text(
+                  '\$$price',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: AppColors.textPrimary,
+                    fontSize: AppConstants.fontSizeNormal,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
+              const SizedBox(width: AppConstants.paddingSmall),
               GestureDetector(
                 onTap: onAddToCart,
                 child: Container(
