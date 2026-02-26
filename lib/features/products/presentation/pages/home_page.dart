@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:little_commerce/core/constants/app_colors.dart';
 import 'package:little_commerce/core/constants/app_constants.dart';
+import 'package:little_commerce/features/products/presentation/providers/product_provider.dart';
+import 'package:little_commerce/features/products/presentation/widgets/category_tabs.dart';
+import 'package:little_commerce/features/products/presentation/widgets/home_banner.dart';
+import 'package:little_commerce/features/products/presentation/widgets/product_list.dart';
 
 const _searchInputBorder = OutlineInputBorder(
   borderRadius: BorderRadius.all(
@@ -9,21 +14,48 @@ const _searchInputBorder = OutlineInputBorder(
   borderSide: BorderSide.none,
 );
 
-class HomePage extends StatelessWidget {
+class HomePage extends ConsumerWidget {
   const HomePage({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final productsState = ref.watch(productsProvider);
+
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: _buildAppBar(),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: AppConstants.paddingMedium),
-            _buildSearchBar(),
-          ],
+      body: RefreshIndicator(
+        color: AppColors.primary,
+        onRefresh: () async {
+          ref.invalidate(productsProvider);
+          await ref.read(productsProvider.future);
+        },
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: AppConstants.paddingMedium),
+              _buildSearchBar(),
+              const SizedBox(height: AppConstants.paddingMedium),
+              const HomeBanner(),
+              const SizedBox(height: AppConstants.paddingLarge),
+              const CategoryTabs(),
+              const SizedBox(height: AppConstants.paddingLarge),
+              productsState.when(
+                loading: () => const _ProductsLoadingWidget(),
+                error: (error, _) => _ProductsErrorWidget(
+                  error: error.toString(),
+                  onRetry: () async {
+                    ref.invalidate(productsProvider);
+                    await ref.read(productsProvider.future);
+                  },
+                ),
+                data: (products) => ProductList(products: products),
+              ),
+              const SizedBox(height: AppConstants.paddingLarge),
+            ],
+          ),
         ),
       ),
     );
@@ -45,8 +77,10 @@ class HomePage extends StatelessWidget {
         Stack(
           children: [
             IconButton(
-              icon: const Icon(Icons.shopping_cart_outlined,
-                  color: AppColors.textPrimary),
+              icon: const Icon(
+                Icons.shopping_cart_outlined,
+                color: AppColors.textPrimary,
+              ),
               onPressed: () {},
             ),
             Positioned(
@@ -77,7 +111,9 @@ class HomePage extends StatelessWidget {
 
   Widget _buildSearchBar() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: AppConstants.paddingMedium),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppConstants.paddingMedium,
+      ),
       child: TextField(
         decoration: InputDecoration(
           hintText: 'Search products...',
@@ -85,15 +121,14 @@ class HomePage extends StatelessWidget {
             color: AppColors.hintText,
             fontSize: AppConstants.fontSizeMedium,
           ),
-          prefixIcon: const Icon(
-            Icons.search,
-            color: AppColors.grey,
-          ),
+          prefixIcon: const Icon(Icons.search, color: AppColors.grey),
           suffixIcon: Container(
             margin: const EdgeInsets.all(AppConstants.paddingSmall),
             decoration: BoxDecoration(
               color: AppColors.primary,
-              borderRadius: BorderRadius.circular(AppConstants.borderRadiusSmall),
+              borderRadius: BorderRadius.circular(
+                AppConstants.borderRadiusSmall,
+              ),
             ),
             child: const Icon(
               Icons.tune_rounded,
@@ -110,12 +145,79 @@ class HomePage extends StatelessWidget {
           border: _searchInputBorder,
           enabledBorder: _searchInputBorder,
           focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(AppConstants.borderRadiusMedium),
-            borderSide: const BorderSide(
-              color: AppColors.primary,
-              width: 1.5,
+            borderRadius: BorderRadius.circular(
+              AppConstants.borderRadiusMedium,
             ),
+            borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ProductsLoadingWidget extends StatelessWidget {
+  const _ProductsLoadingWidget();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Padding(
+      padding: EdgeInsets.symmetric(vertical: 80),
+      child: Center(
+        child: CircularProgressIndicator(color: AppColors.primary),
+      ),
+    );
+  }
+}
+
+class _ProductsErrorWidget extends StatelessWidget {
+  final String error;
+  final VoidCallback onRetry;
+
+  const _ProductsErrorWidget({
+    required this.error,
+    required this.onRetry,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 80),
+      child: Center(
+        child: Column(
+          children: [
+            const Icon(
+              Icons.wifi_off_rounded,
+              size: 48,
+              color: AppColors.grey,
+            ),
+            const SizedBox(height: AppConstants.paddingMedium),
+            Text(
+              error,
+              style: const TextStyle(color: AppColors.textSecondary),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: AppConstants.paddingMedium),
+            GestureDetector(
+              onTap: onRetry,
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppConstants.paddingLarge,
+                  vertical: AppConstants.paddingSmall,
+                ),
+                decoration: BoxDecoration(
+                  color: AppColors.primary,
+                  borderRadius: BorderRadius.circular(
+                    AppConstants.borderRadiusSmall,
+                  ),
+                ),
+                child: const Text(
+                  'Retry',
+                  style: TextStyle(color: AppColors.secondary),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

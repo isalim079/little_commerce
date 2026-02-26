@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:little_commerce/features/products/presentation/pages/home_page.dart';
 
-void main() {
+void main() async {
+
+WidgetsFlutterBinding.ensureInitialized();
+
   runApp(
     const ProviderScope(
       child: MyApp()

@@ -50,6 +50,7 @@ dependencies:
   # Helper
   equatable: ^2.0.8
   freezed_annotation: ^3.1.0
+  carousel_slider: ^5.1.2
 
 dev_dependencies:
   flutter_test:
